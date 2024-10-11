@@ -1,0 +1,34 @@
+/* Flexbox für das Layout */
+.chart-container {
+  display: flex;
+  justify-content: space-around; /* Platz zwischen den Charts */
+  align-items: center; /* Zentriert die Charts vertikal */
+  flex-wrap: wrap; /* Zeilenumbruch bei schmaleren Bildschirmen */
+  margin: 20px;
+  height: 100vh; /* Stellt sicher, dass der Container die volle Höhe des Bildschirms hat */
+}
+
+/* Styling für die Charts */
+.chart {
+  flex: 1;  /* Jeder Chart nimmt einen flexiblen Platz ein */
+  max-width: 45%; /* Maximal 45% Breite für große Bildschirme */
+  min-width: 300px; /* Mindestbreite für kleinere Bildschirme */
+  margin: 10px; /* Abstand zwischen den Charts */
+  display: flex; /* Flexbox für das Chart */
+  flex-direction: column; /* Anordnung der Inhalte in einer Spalte */
+  justify-content: center; /* Zentriert den Inhalt in y-Richtung */
+}
+
+/* Sicherstellen, dass das Canvas korrekt skaliert */
+canvas {
+  width: 100%; /* Canvas auf 100% der Breite des Containers setzen */
+  height: 400px; /* Setze eine spezifische Höhe für das Diagramm */
+}
+
+/* Stil für den Titel über dem Piechart */
+.pie-title {
+  text-align: center; /* Text zentrieren */
+  font-size: 20px; /* Schriftgröße */
+  font-weight: bold; /* Fettdruck */
+  margin-bottom: 10px; /* Abstand zum Piechart */
+}

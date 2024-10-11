@@ -1,0 +1,24 @@
+mat-toolbar {
+  display: flex;
+  align-items: center; /* Align items vertically in the center */
+}
+
+.nav-links {
+  display: flex; /* Use Flexbox layout */
+  flex: 1; /* Allow the nav links to take available space */
+  justify-content: space-around; /* Evenly space the links */
+}
+
+.logo {
+  font-size: 24px; /* Adjust logo size as needed */
+  margin-right: 16px; /* Add some space to the right of the logo */
+}
+
+
+nav a {
+  color: white; /* White text color for links */
+}
+
+nav a:hover {
+  text-decoration: underline; /* Underline on hover */
+}

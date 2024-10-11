@@ -1,0 +1,146 @@
+/* General Styles */
+body {
+  background-color: #1e1e2d; /* Dark background */
+  color: #ffffff; /* Light text for contrast */
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Container to center and space out content */
+.container {
+  max-width: 1200px;
+  background-color: #1e1e2d; /* Dark background */
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Section for drinks and pricing */
+.section {
+  background-color: #2b2b40;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Heading styles */
+h1, h2, h3, h5 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #ffcc00; /* A gold-ish color for headings */
+}
+
+h2 {
+  font-size: 1.5rem;
+}
+
+/* Table for drink prices */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th, .table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #444;
+}
+
+.table th {
+  background-color: #34344b;
+  color: #ffcc00;
+}
+
+.table td {
+  background-color: #2b2b40;
+}
+
+.table td .price {
+  color: #00e676; /* Highlight price with a light green */
+  font-weight: bold;
+}
+
+/* Input fields */
+input[type="text"], input[type="number"] {
+  width: calc(100% - 20px);
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #444;
+  border-radius: 5px;
+  background-color: #1e1e2d;
+  color: #fff;
+  font-size: 1rem;
+}
+
+input:focus {
+  outline: none;
+  border-color: #ffcc00;
+}
+
+/* Buttons */
+button {
+  background-color: #ffcc00;
+  color: #1e1e2d;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+button:hover {
+  background-color: #e6b800; /* Darker on hover */
+}
+
+button:disabled {
+  background-color: #555;
+  color: #888;
+  cursor: not-allowed;
+}
+
+/* Form for adding a new drink */
+.new-drink-form {
+  margin-top: 20px;
+}
+
+.new-drink-form label {
+  font-size: 1rem;
+  margin-bottom: 10px;
+  display: block;
+  color: #ffcc00;
+}
+
+.new-drink-form input, .new-drink-form button {
+  display: block;
+  width: 100%;
+}
+
+.new-drink-form button {
+  margin-top: 15px;
+  font-weight: bold;
+}
+
+/* Select dropdowns */
+select {
+  padding: 10px;
+  width: 100%;
+  margin-bottom: 10px;
+  background-color: #1e1e2d;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 5px;
+}
+
+select:focus {
+  outline: none;
+  border-color: #ffcc00;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  color: #888;
+  margin-top: 50px;
+}

@@ -1,0 +1,49 @@
+.sales-tracker {
+  padding: 20px; /* Padding around the sales tracker */
+}
+
+.drink-list {
+  display: grid; /* Use CSS Grid for layout */
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Create responsive columns */
+  gap: 20px; /* Space between items */
+}
+
+.drink-item {
+  background-color: #1e1e1e; /* Dark background */
+  border-radius: 8px; /* Rounded corners */
+  padding: 20px; /* Inner padding */
+  text-align: center; /* Centered text */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: transform 0.3s, box-shadow 0.3s; /* Animation on hover */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Shadow effect */
+}
+
+.drink-item:hover {
+  transform: translateY(-5px); /* Lift effect on hover */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.7); /* Darker shadow on hover */
+}
+
+h3 {
+  color: white; /* White text color for the drink name */
+}
+
+p {
+  color: #bbb; /* Lighter text color for sales count */
+}
+
+
+@media (max-width: 768px) {
+  .drink-list {
+    justify-content: center; /* Center items on smaller screens */
+  }
+
+  .drink-item {
+    max-width: 90%; /* Make items wider on smaller screens */
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .drink-item {
+    max-width: 150px; /* Slightly smaller tiles for medium screens */
+  }
+}
