@@ -3,7 +3,7 @@
   <div class="drink-list">
     <div *ngFor="let drink of drinks; let i = index" class="drink-item" (click)="incrementSales(drink.name)">
       <h3>{{ drink.name }}</h3>
-      <p>Sales Count: {{ salesCount[drink.name][anzahlLabels] }}</p>
+      <!--<p>Sales Count: {{ salesCount[drink.name][anzahlLabels] }}</p>-->
       <!--<button class="big-button" (click)="incrementSales(drink.name)">Sold +1</button>-->
     </div>
   </div>

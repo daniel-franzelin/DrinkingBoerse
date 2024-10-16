@@ -4,15 +4,18 @@
   <div class="section">
     <h2>Fetch from API</h2>
     <mat-slide-toggle
-          class="example-margin"
-          [checked]="checked">
+          class="slide-toggle"
+          [(ngModel)]="checked">
         Slide me!
       </mat-slide-toggle>
-      <input type="url" [(ngModel)]="apiUrl" placeholder="Enter API URL">
-      <button (click)="setToApi()">Submit</button>
+
+      <div *ngIf="checked">
+        <input type="url" [(ngModel)]="apiUrl" placeholder="Enter API URL">
+        <button (click)="setToApi()">Submit</button>
+      </div>
   </div>
 
-  <div class="section">
+  <div *ngIf="!checked" class="section">
     <h2>Available Drinks</h2>
     <table class="table">
       <thead>
@@ -37,7 +40,7 @@
     </table>
   </div>
 
-  <div class="section new-drink-form">
+  <div *ngIf="!checked" class="section new-drink-form">
     <h2>Add New Drink</h2>
     <label for="drinkName">Drink Name</label>
     <input #drinknameref (keydown.enter)="onEnter(drinknameref.value, drinkpriceref.value);drinknameref.value=''; drinkpriceref.value='';" type="text" id="drinkName"  placeholder="Enter drink name">
@@ -52,7 +55,7 @@
     <h2>Synchronisation Time</h2>
     <span style="color: white; padding-bottom: 15px;">Stellt Aktualisierungszeit der Applikation ein</span>
     <input style="margin-top: 10px;" id="inputtime" type="number" #timeref placeholder="Zeit in min">
-    <span style="color: white;">Standard: 5 min</span>
+    <span style="color: white; margin-right: 15px;">Standard: 5 min</span>
     <button (click)="updateTime(timeref.value)">Übernehmen</button>
   </div>
 </div>

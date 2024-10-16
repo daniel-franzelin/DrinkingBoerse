@@ -1,5 +1,6 @@
 import { DrinkService } from './../drink.service';
 import { Component } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { Drink } from 'src/shared/drink';
 
 @Component({
@@ -8,13 +9,13 @@ import { Drink } from 'src/shared/drink';
   styleUrls: ['./overview.component.scss']
 })
 export class OverviewComponent {
-  public drinks: Drink[];
+  public drinks: Drink[] = [];
   private fromLocalStorage: boolean = true;
-  protected checked: boolean = false;//#endregion
+  protected checked: boolean = false;
   apiUrl: string = '';
 
   constructor(private ds: DrinkService) {
-    this.drinks = ds.getDrinks();
+    ds.getDrinks().subscribe((drinks) => { this.drinks = drinks; });
   }
 
   addDrink(drinkname: string, drinkprice: string) {
@@ -30,8 +31,8 @@ export class OverviewComponent {
     this.updateDrinks();
   }
 
-  updateDrinks() {
-    this.drinks = this.ds.getDrinks();
+  async updateDrinks() {
+    this.drinks = await firstValueFrom(this.ds.getDrinks());
   }
 
   setToApi() {

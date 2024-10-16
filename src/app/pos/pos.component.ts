@@ -1,3 +1,4 @@
+import { firstValueFrom } from 'rxjs';
 import { DrinkService } from '../drink.service';
 import { Drink } from './../../shared/drink';
 import { Component } from '@angular/core';
@@ -33,9 +34,10 @@ export class PosComponent {
     this.update();
   }
 
-  update() {
-    this.drinks = this.ds.getDrinks();
-    this.salesCount = this.ds.getSalesCountMap();
+  async update() {
+    this.drinks = await firstValueFrom(this.ds.getDrinks());
+    console.log(this.drinks);
+    this.salesCount = await this.ds.getSalesCountMap();
   }
 
 }
