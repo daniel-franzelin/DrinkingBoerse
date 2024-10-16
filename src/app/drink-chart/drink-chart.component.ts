@@ -35,9 +35,9 @@ export class DrinkChartComponent implements OnInit {
 
   }
 
-  ngOnInit(): void {
+  async ngOnInit() {
     window.addEventListener('storage', this.handleStorageChange.bind(this));
-
+    console.log("is Local: " + this.ds.isLocal())
     // Registering necessary components including LineController
     Chart.register(
       LinearScale,
@@ -52,6 +52,9 @@ export class DrinkChartComponent implements OnInit {
       CategoryScale
     );
     console.log("init again")
+    this.salesCount = await this.ds.updateSalesCountMap();
+    console.log(this.salesCount)
+    console.log(this.ds.getSalesCountMap())
     this.createChart();
     this.startRefreshing();
     this.syncTime = this.ds.getSyncTime();
@@ -70,7 +73,7 @@ export class DrinkChartComponent implements OnInit {
   }
 
   async test() {
-    this.salesCount = await this.ds.getSalesCountMap();
+    this.salesCount = this.ds.getSalesCountMap();
     console.log("salescount: ")
     console.log(this.salesCount)
     this.ds.getDrinks().subscribe(drink => drink.forEach( d => this.salesDifferenceMap[d.name] = Array(this.anzahlLabels).fill(0)))
@@ -122,8 +125,12 @@ export class DrinkChartComponent implements OnInit {
 
     let pieData = [];
     let backColor = [];
-    let map = await this.ds.getSalesCountMap();
+    let map = await this.ds.updateSalesCountMap();
+    console.log("map")
+    console.log(map)
     let drinks = await firstValueFrom(this.ds.getDrinks());
+    console.log("drinks")
+    console.log(drinks)
     for(let i = 0; i < drinks.length; i++) {
       pieData.push(map[drinks[i].name][this.anzahlLabels]);
       backColor.push(drinks[i].color)
@@ -162,6 +169,7 @@ export class DrinkChartComponent implements OnInit {
   startRefreshing() {
     this.intervalId = setInterval(() => {
       this.updateChart();
+      console.log("is local: " +this.ds.isLocal())
     }, this.syncTime * 60 * 1000); // 10 minutes in milliseconds
   }
 

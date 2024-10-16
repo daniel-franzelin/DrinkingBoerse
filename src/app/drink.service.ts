@@ -14,8 +14,9 @@ export class DrinkService {
   private salesCountMap: { [drinkName: string]: number[] } = {};
   private salesCountKey = 'drinkSalesCount';
   private drinkKey = 'drinkMap'
+  //private localKey = 'local';
   private syncTime = 1; // in min
-  private fromLocalStorage: boolean = false;
+  private fromLocalStorage: boolean = true;
   private api: string = "http://172.16.170.100:8888/api/";
   private anzahlLabels = 5;
 
@@ -31,6 +32,7 @@ export class DrinkService {
     if(this.fromLocalStorage) {
       localStorage.setItem(this.salesCountKey, JSON.stringify(this.salesCountMap));
       localStorage.setItem(this.drinkKey, JSON.stringify(this.drinks));
+      //localStorage.setItem(this.localKey, JSON.stringify(this.fromLocalStorage));
     } else {
       //TODO implement else
     }
@@ -38,7 +40,8 @@ export class DrinkService {
   }
 
   setFetchMethod(api: string) {
-    this.fromLocalStorage = true;
+    console.log("Setting fetch method to " + api);
+    this.fromLocalStorage = false;
     this.api = api;
   }
 
@@ -94,7 +97,10 @@ export class DrinkService {
   }
 
   getSalesCountMap() {
-    return this.salesCountMap;
+    if(this.fromLocalStorage) {
+      return JSON.parse(localStorage.getItem(this.salesCountKey) || '{}');
+    } else
+      return this.salesCountMap;
   }
 
   async updateSalesCountMap(): Promise<{ [drinkName: string]: number[]; }> {

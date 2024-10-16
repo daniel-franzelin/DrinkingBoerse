@@ -13,7 +13,7 @@ export class PosComponent {
   salesCount: { [key: string] : number[] } = {}
   anzahlLabels: number = this.ds.getAnzahlLabels();
 
-  constructor(private ds: DrinkService) {
+  constructor(protected ds: DrinkService) {
 
   }
 

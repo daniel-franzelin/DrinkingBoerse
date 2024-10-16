@@ -1,5 +1,6 @@
 import { DrinkService } from './../drink.service';
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { Drink } from 'src/shared/drink';
 
@@ -14,7 +15,7 @@ export class OverviewComponent {
   protected checked: boolean = false;
   apiUrl: string = '';
 
-  constructor(private ds: DrinkService) {
+  constructor(private ds: DrinkService, private router: Router) {
     ds.getDrinks().subscribe((drinks) => { this.drinks = drinks; });
   }
 
@@ -36,7 +37,9 @@ export class OverviewComponent {
   }
 
   setToApi() {
+    console.log("Setting to API");
     this.ds.setFetchMethod(this.apiUrl)
+    this.router.navigate(['/chart']);
   }
 
   updateTime(syncTime: string) {
