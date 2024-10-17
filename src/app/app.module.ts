@@ -13,6 +13,7 @@ import {MatToolbarModule} from '@angular/material/toolbar';
 import { DrinkChartComponent } from './drink-chart/drink-chart.component';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import { HttpClientModule } from '@angular/common/http';
+import { PriceDropComponent } from './price-drop/price-drop.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { HttpClientModule } from '@angular/common/http';
     OverviewComponent,
     PosComponent,
     NavbarComponent,
-    DrinkChartComponent
+    DrinkChartComponent,
+    PriceDropComponent
   ],
   imports: [
     BrowserModule,

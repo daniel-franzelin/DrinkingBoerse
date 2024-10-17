@@ -196,22 +196,24 @@ export class DrinkService {
     return this.syncTime;
   }
 
-  private calculateTotalSales(): number {
-    return this.drinks.reduce((total, drink) => total + this.getSalesCountOfDrink(drink.name), 0);
+  private async calculateTotalSales(): Promise<number> {
+    return (await firstValueFrom(this.getDrinks())).reduce((total, drink) => total + this.getSalesCountOfDrink(drink.name), 0)
+
   }
 
   public async adjustPrices() {
-    const totalSales = this.calculateTotalSales();
-    const drinkVariety = this.drinks.length;
-
+    const totalSales = await this.calculateTotalSales();
+    const drinkVariety = (await firstValueFrom(this.getDrinks())).length;
+    console.log("Total sales: " + totalSales);
     // Dynamic thresholds based on the number of drinks
     const increaseThreshold = drinkVariety * 0.05; // Increase threshold grows with drink variety
     const decreaseThreshold = drinkVariety * 0.02; // Decrease threshold grows with drink variety
+    console.log("Increase threshold: " + increaseThreshold);
     const drinks = await firstValueFrom(this.getDrinks());
     for (const drink of drinks) {
       // Calculate the relative sales percentage
       const relativeSales = this.getSalesCountOfDrink(drink.name) / totalSales || 0; // Prevent division by zero
-
+      console.log("Relative sales for " + drink.name + ": " + relativeSales);
       // Determine the price change
       let priceChange = 0;
 
@@ -227,14 +229,20 @@ export class DrinkService {
       let newPrice = drink.price + priceChange;
       //TODO: put the algorithm to use
       // Ensure the new price is within min and max bounds
-      /*if (newPrice < drink.minPrice) {
-        newPrice = drink.minPrice;
-      } else if (newPrice > drink.maxPrice) {
-        newPrice = drink.maxPrice;
+      if (drink.purchasePrice && newPrice < drink.purchasePrice * 1.2 ) {
+        newPrice = this.roundPriceToNearestHalf(drink.purchasePrice * 1.2);
+      } else if (drink.purchasePrice && newPrice > drink.purchasePrice * 5) {
+        newPrice = this.roundPriceToNearestHalf(drink.purchasePrice * 5);
       }
 
       // Update the drink's base price
-      drink.basePrice = parseFloat(newPrice.toFixed(2)); // Update to 2 decimal places*/
+      console.log("New price for " + drink.name + ": " + newPrice);
+      drink.price = parseFloat(newPrice.toFixed(2)); // Update to 2 decimal places*/
     }
+  }
+
+  roundPriceToNearestHalf(price: number): number {
+    // Multiply by 2, round to nearest integer, then divide by 2 to get nearest 0.5
+    return Math.round(price * 2) / 2;
   }
 }

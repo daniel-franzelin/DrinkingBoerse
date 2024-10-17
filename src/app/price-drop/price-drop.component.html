@@ -1,0 +1,4 @@
+<div>
+  <p [@crazyPriceDrop]="isPriceDropped ? 'dropped' : 'normal'">Price: {{ drink?.price }}</p>
+  <button (click)="simulatePriceDrop()">Simulate Price Drop</button>
+</div>
