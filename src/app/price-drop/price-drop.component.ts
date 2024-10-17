@@ -1,5 +1,5 @@
-import { trigger, style, animate, transition, keyframes } from '@angular/animations';
-import { Component, Input } from '@angular/core';
+import { trigger, style, animate, transition, keyframes, state } from '@angular/animations';
+import { Component, Input, SimpleChanges } from '@angular/core';
 import { Drink } from 'src/shared/drink';
 
 @Component({
@@ -7,38 +7,53 @@ import { Drink } from 'src/shared/drink';
   templateUrl: './price-drop.component.html',
   styleUrls: ['./price-drop.component.scss'],
   animations: [
-    trigger('crazyPriceDrop', [
-      transition('normal => dropped', [
-        animate(
-          '1s ease-in',
-          keyframes([
-            style({ transform: 'scale(1.5)', offset: 0.2 }),
-            style({ transform: 'rotate(10deg) translateX(10px)', offset: 0.4 }),
-            style({ transform: 'rotate(-10deg) translateX(-10px)', offset: 0.6 }),
-            style({ transform: 'rotate(5deg)', offset: 0.8 }),
-            style({ transform: 'scale(1)', offset: 1 }),
-          ])
-        ),
+    // Fade in and out for the text
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('800ms ease-in', style({ opacity: 1 }))
       ]),
+      transition(':leave', [
+        animate('800ms ease-out', style({ opacity: 0 }))
+      ])
     ]),
-  ],
+
+    // Slide in and out for Pepe image
+    trigger('slideInOut', [
+      transition(':enter', [
+        animate('4s ease-in-out', keyframes([  // Increased animation duration
+          style({ transform: 'translateX(-100vw)', offset: 0 }),  // Start from off-screen left
+          style({ transform: 'translateX(50vw)', offset: 0.5 }),  // Move to the center
+          style({ transform: 'translateX(100vw)', offset: 1 }),   // Exit off-screen right
+        ]))
+      ]),
+      transition(':leave', [
+        animate('2s ease-in-out', keyframes([  // Adjusted exit duration
+          style({ transform: 'translateX(0)', offset: 0 }),
+          style({ transform: 'translateX(-100vw)', offset: 1 })
+        ]))
+      ])
+    ])
+  ]
 })
 export class PriceDropComponent {
   @Input() drink: Drink|undefined= undefined;
   priceDropState = 'normal';
-  isPriceDropped = false;
+  showAnimation = false;
 
 
-  ngOnChanges(): void {
-    if (this.drink) {
-      this.simulatePriceDrop();
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['drink'] && changes['drink'].currentValue) {
+      this.triggerAnimation();
     }
   }
 
-  simulatePriceDrop() {
-    this.isPriceDropped = true;
+  triggerAnimation() {
+    this.showAnimation = true;
 
-    // Reset the animation state after a while
-    setTimeout(() => (this.isPriceDropped = false), 1000);
+    // Hide animation after 3 seconds
+    setTimeout(() => {
+      this.showAnimation = false;
+    }, 2500);
   }
 }

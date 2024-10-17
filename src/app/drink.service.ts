@@ -13,6 +13,7 @@ export class DrinkService {
 
   private salesCountMap: { [drinkName: string]: number[] } = {};
   private salesCountKey = 'drinkSalesCount';
+  private priceDropArray: Drink[] = [];
   private drinkKey = 'drinkMap'
   //private localKey = 'local';
   private syncTime = 1; // in min
@@ -201,6 +202,12 @@ export class DrinkService {
 
   }
 
+  getPriceDropArray() {
+    let ret = this.priceDropArray;
+    this.priceDropArray = [];
+    return ret;
+  }
+
   public async adjustPrices() {
     const totalSales = await this.calculateTotalSales();
     const drinkVariety = (await firstValueFrom(this.getDrinks())).length;
@@ -234,6 +241,9 @@ export class DrinkService {
       } else if (drink.purchasePrice && newPrice > drink.purchasePrice * 5) {
         newPrice = this.roundPriceToNearestHalf(drink.purchasePrice * 5);
       }
+
+      if(newPrice != drink.price)
+        this.priceDropArray.push(drink)
 
       // Update the drink's base price
       console.log("New price for " + drink.name + ": " + newPrice);

@@ -14,6 +14,7 @@ import {
   ArcElement
 } from 'chart.js';
 import { DrinkService } from '../drink.service';
+import { Drink } from 'src/shared/drink';
 
 @Component({
   selector: 'app-drink-chart',
@@ -28,6 +29,7 @@ export class DrinkChartComponent implements OnInit {
   private syncTime: number = this.ds.getSyncTime();
   public pieChart: any;
   private anzahlLabels: number = this.ds.getAnzahlLabels();
+  priceDropData: Drink[] = [];
 
 
   constructor(private ds: DrinkService) {
@@ -162,8 +164,9 @@ export class DrinkChartComponent implements OnInit {
   }
 
   startRefreshing() {
-    this.intervalId = setInterval(() => {
-      this.ds.adjustPrices();
+    this.intervalId = setInterval(async () => {
+      await this.ds.adjustPrices();
+      this.priceDropData = this.ds.getPriceDropArray();
       this.updateChart();
     }, this.syncTime * 60 * 1000); // 10 minutes in milliseconds
   }

@@ -1,4 +1,10 @@
-<div>
-  <p [@crazyPriceDrop]="isPriceDropped ? 'dropped' : 'normal'">Price: {{ drink?.price }}</p>
-  <button (click)="simulatePriceDrop()">Simulate Price Drop</button>
+<div class="drink-animation-container" *ngIf="showAnimation">
+  <div class="text-animation" [@fadeInOut]>
+    <h1>{{ drink?.name }}<hr>New Price: {{drink?.price}}</h1>
+  </div>
+  <img src="assets/pepe.jpeg" alt="Pepe" class="pepe-image" [@slideInOut] />
 </div>
+
+<!--*ngFor="let item of list; trackBy:item"<div *ngIf="showAnimation" class="drink-animation" [@flyInOut]="'in'">
+  <div class="floating-drink">{{ drink?.name }}<hr>New Price: {{drink?.price}}</div>
+</div>-->
