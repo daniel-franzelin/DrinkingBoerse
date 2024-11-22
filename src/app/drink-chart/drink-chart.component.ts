@@ -1,5 +1,5 @@
-import { firstValueFrom } from 'rxjs';
-import { Component, OnInit } from '@angular/core';
+import {firstValueFrom} from 'rxjs';
+import {Component, OnInit} from '@angular/core';
 import {
   Chart,
   LinearScale,
@@ -13,8 +13,8 @@ import {
   PieController,
   ArcElement
 } from 'chart.js';
-import { DrinkService } from '../drink.service';
-import { Drink } from 'src/shared/drink';
+import {DrinkService} from '../drink.service';
+import {Drink} from 'src/shared/drink';
 
 @Component({
   selector: 'app-drink-chart',
@@ -25,7 +25,7 @@ export class DrinkChartComponent implements OnInit {
   public chart: any;
   public intervalId: any;
   private salesCount: { [drinkName: string]: number[] } = {};
-  private salesDifferenceMap:  { [drinkName: string]: number[] } = {};
+  private salesDifferenceMap: { [drinkName: string]: number[] } = {};
   private syncTime: number = this.ds.getSyncTime();
   public pieChart: any;
   private anzahlLabels: number = this.ds.getAnzahlLabels();
@@ -73,7 +73,7 @@ export class DrinkChartComponent implements OnInit {
 
   async test() {
     this.salesCount = this.ds.getSalesCountMap();
-    this.ds.getDrinks().subscribe(drink => drink.forEach( d => this.salesDifferenceMap[d.name] = Array(this.anzahlLabels).fill(0)))
+    this.ds.getDrinks().subscribe(drink => drink.forEach(d => this.salesDifferenceMap[d.name] = Array(this.anzahlLabels).fill(0)))
     this.calcDifferenceInSales();
   }
 
@@ -90,15 +90,16 @@ export class DrinkChartComponent implements OnInit {
         backgroundColor: 'transparent', // No fill color
         fill: false, // No fill under the line
         tension: 0.1 // Optional curve
-      }))});
+      }))
+    });
 
-      //console.log("datasets")
-      //console.log(datasets)
+    //console.log("datasets")
+    //console.log(datasets)
 
     this.chart = new Chart('canvas', {
       type: 'line', // Line chart type
       data: {
-        labels: labels , // X-axis labels (e.g., days)
+        labels: labels, // X-axis labels (e.g., days)
         datasets: datasets
       },
       options: {
@@ -128,7 +129,7 @@ export class DrinkChartComponent implements OnInit {
     let drinks = await firstValueFrom(this.ds.getDrinks());
     //console.log("drinks")
     //console.log(drinks)
-    for(let i = 0; i < drinks.length; i++) {
+    for (let i = 0; i < drinks.length; i++) {
       pieData.push(map[drinks[i].name][this.anzahlLabels]);
       backColor.push(drinks[i].color)
     }
@@ -153,7 +154,7 @@ export class DrinkChartComponent implements OnInit {
           },
           tooltip: {
             callbacks: {
-              label: function(tooltipItem: any) {
+              label: function (tooltipItem: any) {
                 return tooltipItem.label + ': ' + tooltipItem.raw + ' Verkäufe';
               }
             }
@@ -193,7 +194,7 @@ export class DrinkChartComponent implements OnInit {
     let backColor = [];
     let map = await this.ds.getSalesCountMap();
     let drinks = await firstValueFrom(this.ds.getDrinks());
-    for(let i = 0; i < drinks.length; i++) {
+    for (let i = 0; i < drinks.length; i++) {
       pieData.push(map[drinks[i].name][this.anzahlLabels]);
       backColor.push(drinks[i].color)
     }
@@ -215,7 +216,7 @@ export class DrinkChartComponent implements OnInit {
   }
 
   async updateSales() {
-    if(this.ds.isLocal())
+    if (this.ds.isLocal())
       this.salesCount = JSON.parse(localStorage.getItem("drinkSalesCount") || '{}');
     else
       this.salesCount = await this.ds.getSalesCountMap();
@@ -223,16 +224,16 @@ export class DrinkChartComponent implements OnInit {
 
   getTimeLabels(): string[] {
     const now = new Date();
-    return Array.from({ length: this.anzahlLabels }, (_, index) => {
+    return Array.from({length: this.anzahlLabels}, (_, index) => {
       const time = new Date(now.getTime() - (index * this.syncTime * 60 * 1000)); // 10 minutes interval
-      return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return time.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
     }).reverse(); // Reverse to get the latest time at the end
   }
 
   async calcDifferenceInSales() {
     let drinks = await firstValueFrom(this.ds.getDrinks());
     this.salesCount = this.ds.getSalesCountMap();
-    for(let i = 0; i < this.anzahlLabels; i++) {
+    for (let i = 0; i < this.anzahlLabels; i++) {
       drinks.forEach(drink => {
         //console.log(this.salesCount)
         if (!this.salesDifferenceMap[drink.name]) {

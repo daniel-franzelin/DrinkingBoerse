@@ -6,3 +6,9 @@
 <h1>In Progress</h1>
 
 - [ ] price drop animation
+
+- [ ] Save possible drinks on server -> allows saving purchase price and calculate min max 
+- [ ] Allow dynamic setting of min max price
+
+Drink Price Adjust Algorithm
+- [ ] 
