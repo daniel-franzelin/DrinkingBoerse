@@ -160,8 +160,7 @@ export class DrinkService {
     this.drinks.push(new Drink(drinkname, Number(drinkprice)));
     this.salesCountObjectMap[drinkname] = Array(this.anzahlLabels + 1).fill(0);
     if (this.fromLocalStorage) {
-      localStorage.setItem(this.salesCountKey, JSON.stringify(this.salesCountObjectMap)); // Update local storage
-      localStorage.setItem(this.drinkKey, JSON.stringify(this.drinks));
+      this.updateLocalStorage()
     } else
       throw Error
   }
@@ -273,8 +272,10 @@ export class DrinkService {
       const newDrinkPrice = this.calculateNewDrinkPrice(drink)
       drink.price = newDrinkPrice
       drink.price = parseFloat(drink.price.toFixed(2))
-      console.log('Price of ' + drink.name + 'is now: ' + drink.price)
+      console.log('Price of ' + drink.name + ' updated: ' + drink.price)
     })
+    this.drinks = drinks
+    this.updateLocalStorage()
   }
 
   private calculateNewDrinkPrice(drink: Drink): number {
@@ -285,7 +286,6 @@ export class DrinkService {
     const salesFromCurrentInterval = this.getSalesCountOfDrink(drink.name, this.anzahlLabels)
 
     const salesCountMap = this.parseObjectMapToMap(JSON.parse(localStorage.getItem(this.salesCountKey) || '{}'))
-    console.log('parsed salescount to Map ' + salesCountMap)
     const totalSalesFromPreviousInterval: number = Array.from(salesCountMap.values())
       .map(arr => arr[this.anzahlLabels - 1] || 0)
       .reduce((acc, val) => acc + val, 0)
@@ -325,6 +325,12 @@ export class DrinkService {
 
   parseObjectMapToMap(objectMap: { [drinkName: string]: number[] }): Map<string, number[]> {
     return new Map(Object.entries(objectMap))
+  }
+
+  updateLocalStorage() {
+    localStorage.setItem(this.salesCountKey, JSON.stringify(this.salesCountObjectMap)); // Update local storage
+    console.log(this.drinks)
+    localStorage.setItem(this.drinkKey, JSON.stringify(this.drinks));
   }
 }
 
