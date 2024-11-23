@@ -27,7 +27,6 @@ export class DrinkChartComponent implements OnInit {
 
   public chart: any;
   public intervalId: any;
-  private salesDifferenceMap: Map<string, number[]>;
   private syncTime: number = this.drinkService.getSyncTime();
   public pieChart: any;
   private anzahlLabels: number = DataService.CACHE_LENGTH
@@ -42,9 +41,10 @@ export class DrinkChartComponent implements OnInit {
     this.dataService.drinks$.subscribe(value => {
       this.drinks = value
     })
-    this.salesDifferenceMap = new Map
     this.drinks.forEach((drink: Drink) => {
-      this.salesDifferenceMap.set(drink.name, Array(DataService.CACHE_LENGTH - 1).fill(0))
+      if (!this.dataService.getSalesDifferenceMap().has(drink.name)) {
+        this.dataService.setToSalesDifferenceMap(drink.name, Array(DataService.CACHE_LENGTH - 1).fill(0))
+      }
     })
   }
 
@@ -91,11 +91,11 @@ export class DrinkChartComponent implements OnInit {
     // Update the chart labels
     const labels = this.getTimeLabels();
 
-    await this.calcDifferenceInSales();
+    await this.dataService.calcDifferenceInSales();
 
     let datasets = this.drinks.map(drink => ({
       label: `${drink.name} ($${drink.price.toFixed(2)})`, // Include price in label
-      data: this.salesDifferenceMap.get(drink.name), // Use sales count from service
+      data: this.dataService.getSalesDifferenceMap().get(drink.name), // Use sales count from service
       borderColor: drink.color,
       backgroundColor: 'transparent', // No fill color
       fill: false, // No fill under the line
@@ -194,18 +194,6 @@ export class DrinkChartComponent implements OnInit {
     }).reverse(); // Reverse to get the latest time at the end
   }
 
-  async calcDifferenceInSales() {
-    let drinks = this.drinks;
-
-    drinks.forEach(drink => {
-      const tempHistory = this.dataService.getSalesCountHistoryOfDrink(drink.name)
-      let tempArray = Array(this.anzahlLabels - 1).fill(0)
-      for (let i = 0; i < DataService.CACHE_LENGTH - 1; i++) {
-        tempArray[i] = tempHistory[i + 1] - tempHistory[i]
-      }
-      this.salesDifferenceMap.set(drink.name, tempArray)
-    })
-  }
 
   sortDrinksAccordingToSales(drinks: Drink[]): Drink[] {
     const res = [...drinks]

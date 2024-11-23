@@ -25,11 +25,14 @@ export class DataService {
   private drinkSalesCountMap: BehaviorSubject<Map<string, number[]>>
   public readonly drinkSalesCountMap$: Observable<Map<string, number[]>>
 
+  private salesDifferenceMap: Map<string, number[]>;
+
   constructor(private http: HttpClient) {
     this.drinks = new BehaviorSubject<Drink[]>([])
     this.drinks$ = this.drinks.asObservable()
     this.drinkSalesCountMap = new BehaviorSubject<Map<string, number[]>>(new Map)
     this.drinkSalesCountMap$ = this.drinkSalesCountMap.asObservable()
+    this.salesDifferenceMap = new Map
   }
 
   /**
@@ -277,5 +280,24 @@ export class DataService {
     } else {
       throw Error(drinkName + ' was not found in local map')
     }
+  }
+
+  getSalesDifferenceMap() {
+    return this.salesDifferenceMap
+  }
+
+  setToSalesDifferenceMap(key: string, value: number[]) {
+    this.salesDifferenceMap.set(key, value)
+  }
+
+  async calcDifferenceInSales() {
+    this.drinks.value.forEach(drink => {
+      const tempHistory = this.getSalesCountHistoryOfDrink(drink.name)
+      let tempArray = Array(DataService.CACHE_LENGTH - 1).fill(0)
+      for (let i = 0; i < DataService.CACHE_LENGTH - 1; i++) {
+        tempArray[i] = tempHistory[i + 1] - tempHistory[i]
+      }
+      this.salesDifferenceMap.set(drink.name, tempArray)
+    })
   }
 }
