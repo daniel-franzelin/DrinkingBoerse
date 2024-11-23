@@ -1,114 +1,64 @@
-import {EventEmitter, Injectable, OnInit} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {Drink} from 'src/shared/drink';
-//import { Drink } from 'src/shared/Drink';
 import {HttpClient} from '@angular/common/http';
-import {map, Observable, of, firstValueFrom} from 'rxjs';
 import {DataService} from "./data.service";  // Import 'of' for localStorage case
 
 @Injectable({
   providedIn: 'root'
 })
 export class DrinkService {
-  private drinks: Drink[] = [];
-  public drinksChange: EventEmitter<Drink[]> = new EventEmitter<Drink[]>()
-  public intervalId: any;
-
-  private salesCountObjectMap: { [drinkName: string]: number[] } = {};
-  public salesCountKey = 'drinkSalesCount';
-  private priceDropArray: Drink[] = [];
-  public drinkKey = 'drinkMap'
-  //private localKey = 'local';
-  private syncTime = 1; // in min
-  private fromLocalStorage: boolean = true;
-  private api: string = "http://172.16.170.100:8888/api/";
-  private anzahlLabels = 5;
+  private static ANZAHL_LABELS = 5;
   private static RELATIVE_GROWTH_THRESHOLD_TO_ADJUST_PRICE: number = 0.5
   private static USE_ALGORITHM_VERSION: number = 2
 
+  private drinks!: Drink[];
+  private salesCountMap!: Map<string, number[]>
+
+  public intervalId: any;
+  private priceDropArray: Drink[] = [];
+  //private localKey = 'local';
+  private syncTime = 1; // in min
+
   constructor(private http: HttpClient, private dataService: DataService) {
-    this.updateSalesCountMap();
+    this.dataService.drinks$.subscribe(value => {
+      this.drinks = value
+    })
+    this.dataService.drinkSalesCountMap$.subscribe(value => {
+      this.salesCountMap = value
+    })
     this.startRefreshing();
   }
 
   ngOnInit() {
-    this.drinks.forEach(drink => {
-      this.salesCountObjectMap[drink.name] = Array(this.anzahlLabels + 1).fill(0);
-    });
-    if (this.fromLocalStorage) {
-      localStorage.setItem(this.salesCountKey, JSON.stringify(this.salesCountObjectMap));
-      localStorage.setItem(this.drinkKey, JSON.stringify(this.drinks));
-      //localStorage.setItem(this.localKey, JSON.stringify(this.fromLocalStorage));
-    } else {
-      //TODO implement else
-    }
-    this.startRefreshing();
+
   }
 
-  setFetchMethod(api: string) {
-    console.log("Setting fetch method to " + api);
-    this.fromLocalStorage = false;
-    this.api = api;
-  }
-
-  isLocal() {
-    return this.fromLocalStorage;
-  }
-
-  getDrinks(): Observable<Drink[]> {
-    if (this.fromLocalStorage)
-      return of(JSON.parse(localStorage.getItem(this.drinkKey) || '{}'));
-    else {
-      return this.http.get<any[]>(this.api + 'article/').pipe(
-        map(response => {
-          return response.map(item => {
-            let ret = new Drink(
-              item.name,
-              item.resell_price,        // Map 'resell_price' to 'price'
-              item.uuid,                // Optional field
-              item.purchase_price,      // Optional field
-              item.desc                 // Optional field
-            )
-            if (!this.salesCountObjectMap[item.name])
-              this.salesCountObjectMap[item.name] = Array(this.anzahlLabels + 1).fill(0);
-            return ret;
-          })
-        })
-      );
-    }
+  getDrinks(): Drink[] {
+    return this.drinks
   }
 
   getAnzahlLabels() {
-    return this.anzahlLabels
+    return DrinkService.ANZAHL_LABELS
   }
 
-  getSalesCountOfDrink(drinkName: string, index: number) {
-    if (this.fromLocalStorage) {
-      let sales = JSON.parse(localStorage.getItem(this.salesCountKey) || '{}');
-      return sales[drinkName][index];
-    } else
-      throw Error
+  /**
+   * Gives current saved value in DataService
+   * To refresh from server, call DataService#refreshData() before get
+   */
+  getSalesCacheOfDrink(drinkName: string): number[] {
+    return this.salesCountMap.get(drinkName) || []
   }
 
-  getDrinkByUUID(uuid: string): Observable<Drink> {
-    return this.http.get<any>(this.api + 'article/' + uuid).pipe(
-      map(response => new Drink(
-        response.name,
-        response.resell_price,        // Map 'resell_price' to 'price'
-        response.uuid,                // Optional field
-        response.purchase_price,      // Optional field
-        response.desc                 // Optional field
-      ))
-    );
+  /**
+   * Gives current saved value in DataService
+   * To refresh from server, call DataService#refreshData() before get
+   */
+  getSalesCountMap(): Map<string, number[]> {
+    return this.salesCountMap
   }
 
-  getSalesCountMap(): { [drinkName: string]: number[] } {
-    if (this.fromLocalStorage) {
-      return JSON.parse(localStorage.getItem(this.salesCountKey) || '{}');
-    } else
-      return this.salesCountObjectMap;
-  }
-
-  async updateSalesCountMap(): Promise<{ [drinkName: string]: number[]; }> {
+  /*
+  async updateSalesCountMap() {
     //return this.salesCountMap;
     console.log(this.salesCountObjectMap)
     if (this.fromLocalStorage) {
@@ -123,7 +73,7 @@ export class DrinkService {
 
         // Check if the drink is not yet in salesCountMap and initialize it
         if (!this.salesCountObjectMap[drink.name]) {
-          this.salesCountObjectMap[drink.name] = Array(this.anzahlLabels + 1).fill(0);
+          this.salesCountObjectMap[drink.name] = Array(DrinkService.ANZAHL_LABELS + 1).fill(0);
         }
 
         // Update the sales count data
@@ -134,23 +84,17 @@ export class DrinkService {
       await Promise.all(drinkPromises);
 
       return this.salesCountObjectMap;
+
     }
   }
+  */
 
-  getSalesCountMapOfLocal(): { [drinkName: string]: number[] } {
-    if (this.fromLocalStorage) {
-      return JSON.parse(localStorage.getItem(this.salesCountKey) || '{}');
-    } else
-      throw Error
-  }
-
-  async getTotalSales() {
-    let ret = 0;
-    let map = await this.getSalesCountMap();
-    for (let item in await this.getSalesCountMap()) {
-      ret += map[item][this.anzahlLabels];
-    }
-    return ret;
+  getTotalSales(): number {
+    return DataService.sumOfNumberArray(
+      Array.from(this.salesCountMap.values())
+        .map(
+          array => DataService.sumOfNumberArray(array)
+        ))
   }
 
   setSyncTime(syncTime: number) {
@@ -158,60 +102,33 @@ export class DrinkService {
       this.syncTime = syncTime;
   }
 
-  addDrink(drinkname: string, drinkprice: string) {
-    this.drinks.push(new Drink(drinkname, Number(drinkprice)));
-    console.log('Emitting drinks for add')
-    this.drinksChange.emit(this.drinks)
-    console.log('Emit successful')
-    this.salesCountObjectMap[drinkname] = Array(this.anzahlLabels + 1).fill(0);
-    if (this.fromLocalStorage) {
-      this.updateLocalStorage()
-    } else
-      throw Error
+  addDrink(drinkName: string, drinkPrice: number) {
+    this.dataService.addDrink(drinkName, drinkPrice)
   }
 
-  deleteDrink(index: number) {
-    this.drinks.splice(index, 1)
-    console.log('Emitting drinks for delete')
-    this.drinksChange.emit(this.drinks)
-    console.log('Emit successful')
-    //TODO: delete entry for drink in salescount map
-    //this.salesCountMap
+  deleteDrink(drinkName: string) {
+    this.dataService.deleteDrink(drinkName)
   }
 
-  incrementSales(drinkname: string) {
-    this.salesCountObjectMap[drinkname][this.anzahlLabels]++;
-    localStorage.setItem(this.salesCountKey, JSON.stringify(this.salesCountObjectMap));
+  incrementSales(drinkName: string) {
+    this.dataService.incrementSales(drinkName)
   }
 
+  /**
+   * Repeatedly executes the handler function
+   */
   startRefreshing() {
     this.intervalId = setInterval(() => {
-      this.updateSales();
-      console.log(this.salesCountObjectMap)
-
+      this.dataService.shiftSalesCacheHistory();
+      console.log('Shifted sales count map' + this.salesCountMap)
     }, this.syncTime * 60 * 1000); // 10 minutes in milliseconds
-  }
-
-  updateSales() {
-    this.getDrinks().subscribe(drink => drink.forEach(drink => {
-      console.log(drink)
-      //console.log(this.salesCount)
-      this.salesCountObjectMap[drink.name].shift(); //vorher war unten 3 also hab ich jetzt sozusagen auf 4
-      this.salesCountObjectMap[drink.name].push(this.salesCountObjectMap[drink.name][this.anzahlLabels - 1]);
-    }))
-    console.log(this.salesCountObjectMap)
   }
 
   getSyncTime() {
     return this.syncTime;
   }
 
-  private async calculateTotalSales(): Promise<number> {
-    return (await firstValueFrom(this.getDrinks())).reduce((total, drink) => total + this.getSalesCountOfDrink(drink.name, this.anzahlLabels), 0)
-
-  }
-
-  getPriceDropArray() {
+  getPriceChangeArray() {
     let ret = this.priceDropArray;
     this.priceDropArray = []; //TODO: emptying here seems unsecure
     return ret;
@@ -221,16 +138,17 @@ export class DrinkService {
     console.log('Using algorithm: ' + DrinkService.USE_ALGORITHM_VERSION)
     switch (DrinkService.USE_ALGORITHM_VERSION) {
       case 1:
-        await this.adjustPricesV1()
+        await this.adjustPricesOfDrinksV2()
         break
       case 2:
         await this.adjustPricesOfDrinksV2()
         break
       default:
-        await this.adjustPricesV1()
+        await this.adjustPricesOfDrinksV2()
     }
   }
 
+  /*
   public async adjustPricesV1() {
     const totalSales = await this.calculateTotalSales();
     const drinkVariety = (await firstValueFrom(this.getDrinks())).length;
@@ -242,7 +160,7 @@ export class DrinkService {
     const drinks = await firstValueFrom(this.getDrinks());
     for (const drink of drinks) {
       // Calculate the relative sales percentage
-      const relativeSales = this.getSalesCountOfDrink(drink.name, this.anzahlLabels) / totalSales || 0; // Prevent division by zero
+      const relativeSales = this.getSalesCountOfDrink(drink.name, DrinkService.ANZAHL_LABELS) / totalSales || 0; // Prevent division by zero
       console.log("Relative sales for " + drink.name + ": " + relativeSales);
       // Determine the price change
       let priceChange = 0;
@@ -270,47 +188,45 @@ export class DrinkService {
 
       // Update the drink's base price
       console.log("New price for " + drink.name + ": " + newPrice);
-      drink.price = parseFloat(newPrice.toFixed(2)); // Update to 2 decimal places*/
+      drink.price = parseFloat(newPrice.toFixed(2)); // Update to 2 decimal places
     }
   }
+  */
 
   public async adjustPricesOfDrinksV2(): Promise<void> {
-    const drinks: Drink[] = await firstValueFrom(this.getDrinks());
+    const drinks: Drink[] = this.dataService.getAllDrinks();
     drinks.forEach((drink: Drink) => {
-      console.log('Price of ' + drink.name + ' was: ' + drink.price)
+      console.log('Price of ' + drink.name + ' was: ' + this.dataService.getPriceOfDrink(drink.name))
       const newDrinkPrice = this.calculateNewDrinkPrice(drink)
       if (newDrinkPrice !== drink.price) {
         this.priceDropArray.push(drink)
+        this.dataService.setPriceOfDrink(drink.name, parseFloat(newDrinkPrice.toFixed(2)))
       }
-      drink.price = newDrinkPrice
-      drink.price = parseFloat(drink.price.toFixed(2))
-      console.log('Price of ' + drink.name + ' updated: ' + drink.price)
+      console.log('Price of ' + drink.name + ' updated: ' + this.dataService.getPriceOfDrink(drink.name))
     })
-    this.drinks = drinks
-    this.updateLocalStorage()
   }
 
   private calculateNewDrinkPrice(drink: Drink): number {
     const minPrice = drink.purchasePrice ? drink.purchasePrice * 1.2 : 0.5 //TODO: No purchase price?
     const maxPrice = drink.purchasePrice ? drink.purchasePrice * 5 : 5 //TODO: No purchase price?
 
-    const salesFromPreviousInterval = this.getSalesCountOfDrink(drink.name, this.anzahlLabels - 1)
-    const salesFromCurrentInterval = this.getSalesCountOfDrink(drink.name, this.anzahlLabels)
+    const salesAtPreviousInterval = this.dataService.getSalesCountHistoryOfDrink(drink.name)[DrinkService.ANZAHL_LABELS - 1]
+    const salesAtCurrentInterval = this.dataService.getSalesCountHistoryOfDrink(drink.name)[DrinkService.ANZAHL_LABELS]
 
-    const salesCountMap = this.parseObjectMapToMap(JSON.parse(localStorage.getItem(this.salesCountKey) || '{}'))
+    const salesCountMap = this.salesCountMap
     const totalSalesFromPreviousInterval: number = Array.from(salesCountMap.values())
-      .map(arr => arr[this.anzahlLabels - 1] || 0)
+      .map(arr => arr[DrinkService.ANZAHL_LABELS - 1] || 0)
       .reduce((acc, val) => acc + val, 0)
     const totalSalesFromCurrentInterval: number = Array.from(salesCountMap.values())
-      .map(arr => arr[this.anzahlLabels] || 0)
+      .map(arr => arr[DrinkService.ANZAHL_LABELS] || 0)
       .reduce((acc, val) => acc + val, 0)
 
     const totalSalesGrowthFactor = (totalSalesFromCurrentInterval + 1) / (totalSalesFromPreviousInterval + 1) //+1 to prevent null division
     let salesGrowthFactor = 1
-    if (!salesFromCurrentInterval) { //if no sales, decrease price
+    if (!salesAtCurrentInterval) { //if no sales, decrease price
       salesGrowthFactor = DrinkService.RELATIVE_GROWTH_THRESHOLD_TO_ADJUST_PRICE
-    } else if (salesFromPreviousInterval) {
-      salesGrowthFactor = salesFromCurrentInterval / salesFromPreviousInterval
+    } else if (salesAtPreviousInterval) {
+      salesGrowthFactor = salesAtCurrentInterval / salesAtPreviousInterval
     } //if previous no sales and current has sales, leave price stagnant
     console.log('salesGrowthFactor of ' + drink.name + ' was ' + salesGrowthFactor)
     //normalise salesGrowth based on totalSalesGrowth
@@ -337,12 +253,6 @@ export class DrinkService {
 
   parseObjectMapToMap(objectMap: { [drinkName: string]: number[] }): Map<string, number[]> {
     return new Map(Object.entries(objectMap))
-  }
-
-  updateLocalStorage() {
-    localStorage.setItem(this.salesCountKey, JSON.stringify(this.salesCountObjectMap)); // Update local storage
-    console.log(this.drinks)
-    localStorage.setItem(this.drinkKey, JSON.stringify(this.drinks));
   }
 }
 

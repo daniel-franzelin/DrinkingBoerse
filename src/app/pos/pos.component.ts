@@ -1,8 +1,8 @@
-import {firstValueFrom, Subscriber, take} from 'rxjs';
 import {DrinkService} from '../services/drink.service';
-import {Drink} from './../../shared/drink';
-import {Component, EventEmitter} from '@angular/core';
+import {Drink} from '../../shared/drink';
+import {Component} from '@angular/core';
 import {ObserversModule} from "@angular/cdk/observers";
+import {DataService} from "../services/data.service";
 
 @Component({
   selector: 'app-pos',
@@ -10,13 +10,19 @@ import {ObserversModule} from "@angular/cdk/observers";
   styleUrls: ['./pos.component.scss']
 })
 export class PosComponent extends ObserversModule {
-  public drinks: Drink[] = [];
-  salesCount: { [key: string]: number[] } = {}
-  anzahlLabels: number = this.ds.getAnzahlLabels();
+  drinks!: Drink[];
+  salesCountMap!: Map<string, number[]>
 
 
-  constructor(protected ds: DrinkService) {
+  constructor(readonly drinkService: DrinkService,
+              readonly dataService: DataService) {
     super()
+    this.dataService.drinks$.subscribe(value => {
+      this.drinks = value
+    })
+    this.dataService.drinkSalesCountMap$.subscribe(value => {
+      this.salesCountMap = value
+    })
   }
 
   ngOnInit() {
@@ -27,26 +33,18 @@ export class PosComponent extends ObserversModule {
       }
     });*/
     //this.ds.getDrinks().forEach(ele => this.salesCount[ele.name] = 0);
-    this.ds.getDrinks().subscribe(drinks => this.drinks = drinks)
-    this.loadDrinks()
   }
 
   incrementSales(drinkName: string) {
-    this.ds.incrementSales(drinkName)
-    this.update();
+    this.drinkService.incrementSales(drinkName)
   }
 
-  async update() {
-    this.drinks = await firstValueFrom(this.ds.getDrinks());
-    console.log(this.drinks);
-    this.salesCount = await this.ds.getSalesCountMap();
-  }
+  /*
+    async update() {
+      this.drinks = await firstValueFrom(this.drinkService.getDrinks());
+      console.log(this.drinks);
+      this.salesCount = await this.drinkService.getSalesCountMap();
 
-  loadDrinks(): void {
-    console.log('Subscribing to drinksChange')
-    this.ds.drinksChange.subscribe(() => {
-      console.log('emission received')
-      console.log(JSON.parse(localStorage.getItem(this.ds.drinkKey) || '{}'))
-    })
-  }
+    }
+   */
 }
