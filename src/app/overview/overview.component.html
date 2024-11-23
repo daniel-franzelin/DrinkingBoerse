@@ -47,16 +47,16 @@
   <div *ngIf="!useAPI" class="section new-drink-form">
     <h2>Add New Drink</h2>
     <label for="drinkName">Drink Name</label>
-    <input #drinknameref
-           (keydown.enter)="onEnter(drinknameref.value, drinkpriceref.value);drinknameref.value=''; drinkpriceref.value='';"
+    <input [(ngModel)]="addDrinkNameInput"
+           (keydown.enter)="confirmAddDrink()"
            type="text" id="drinkName" placeholder="Enter drink name">
 
     <label for="drinkPrice">Price (€)</label>
-    <input #drinkpriceref
-           (keydown.enter)="onEnter(drinknameref.value, drinkpriceref.value);drinknameref.value=''; drinkpriceref.value='';"
-           type="number" id="drinkPrice" #drinkpriceref placeholder="Enter drink price">
+    <input [(ngModel)]="addDrinkPriceInput"
+           (keydown.enter)="confirmAddDrink()"
+           type="number" id="drinkPrice" placeholder="Enter drink price">
 
-    <button (click)="addDrink(drinknameref.value, drinkpriceref.value);drinknameref.value=''; drinkpriceref.value='';">
+    <button (click)="confirmAddDrink()">
       Add New Drink
     </button>
   </div>

@@ -48,12 +48,13 @@ export class OverviewComponent {
       this.drinkService.setSyncTime(num);
   }
 
-  onEnter(drinkName: string, drinkPrice: string) {
-    this.addDrink(drinkName, drinkPrice); // Call the method to add drink
+  confirmAddDrink() {
+    this.addDrink(this.addDrinkNameInput, this.addDrinkPriceInput); // Call the method to add drink
+    this.clearInputFields()
   }
 
   clearInputFields() {
-    (document.querySelector('#drinkpriceref') as HTMLInputElement).value = '';
-    (document.querySelector('#drinknameref') as HTMLInputElement).value = '';
+    this.addDrinkPriceInput = ''
+    this.addDrinkNameInput = ''
   }
 }
