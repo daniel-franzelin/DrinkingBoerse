@@ -106,6 +106,10 @@ export class DrinkService {
     this.dataService.addDrink(drinkName, drinkPrice)
   }
 
+  /**
+   * Uses dataService to delete drink from database
+   * @param drinkName
+   */
   deleteDrink(drinkName: string) {
     this.dataService.deleteDrink(drinkName)
   }

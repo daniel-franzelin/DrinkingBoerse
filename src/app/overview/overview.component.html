@@ -4,25 +4,25 @@
   <div class="section">
     <h2>Fetch from API</h2>
     <mat-slide-toggle
-          class="slide-toggle"
-          [(ngModel)]="checked">
-        Slide me!
-      </mat-slide-toggle>
+      class="slide-toggle"
+      [(ngModel)]="useAPI">
+      Slide me!
+    </mat-slide-toggle>
 
-      <div *ngIf="checked">
-        <input type="url" [(ngModel)]="apiUrl" placeholder="Enter API URL">
-        <button (click)="setToApi()">Submit</button>
-      </div>
+    <div *ngIf="useAPI">
+      <input type="url" [(ngModel)]="apiUrl" placeholder="Enter API URL">
+      <button (click)="setToApi()">Submit</button>
+    </div>
   </div>
 
-  <div *ngIf="!checked" class="section">
+  <div *ngIf="!useAPI" class="section">
     <h2>Available Drinks</h2>
     <table class="table">
       <thead>
-        <tr>
-          <th>Drink</th>
-          <th>Price</th>
-        </tr>
+      <tr>
+        <th>Drink</th>
+        <th>Price</th>
+      </tr>
       </thead>
       <div *ngIf="this.drinks.length === 0; else elseBlock">
         <h3>No drinks added yet!</h3>
@@ -30,25 +30,35 @@
       </div>
       <ng-template #elseBlock>
         <tbody *ngFor="let drink of this.drinks; let i = index">
-          <tr>
-            <td><span style="color: white;">{{ drink.name }}</span></td>
-            <td><span class="price"> {{ drink.price }}€ </span> <button (click)="deleteDrink(i)"><mat-icon class="mat-18">delete</mat-icon></button> </td>
-          </tr>
-          <!-- More rows can be added dynamically -->
+        <tr>
+          <td><span style="color: white;">{{ drink.name }}</span></td>
+          <td><span class="price"> {{ drink.price }}€ </span>
+            <button (click)="deleteDrink(drink.name)">
+              <mat-icon class="mat-18">delete</mat-icon>
+            </button>
+          </td>
+        </tr>
+        <!-- More rows can be added dynamically -->
         </tbody>
       </ng-template>
     </table>
   </div>
 
-  <div *ngIf="!checked" class="section new-drink-form">
+  <div *ngIf="!useAPI" class="section new-drink-form">
     <h2>Add New Drink</h2>
     <label for="drinkName">Drink Name</label>
-    <input #drinknameref (keydown.enter)="onEnter(drinknameref.value, drinkpriceref.value);drinknameref.value=''; drinkpriceref.value='';" type="text" id="drinkName"  placeholder="Enter drink name">
+    <input #drinknameref
+           (keydown.enter)="onEnter(drinknameref.value, drinkpriceref.value);drinknameref.value=''; drinkpriceref.value='';"
+           type="text" id="drinkName" placeholder="Enter drink name">
 
     <label for="drinkPrice">Price (€)</label>
-    <input (keydown.enter)="onEnter(drinknameref.value, drinkpriceref.value);drinknameref.value=''; drinkpriceref.value='';" type="number" id="drinkPrice" #drinkpriceref placeholder="Enter drink price">
+    <input #drinkpriceref
+           (keydown.enter)="onEnter(drinknameref.value, drinkpriceref.value);drinknameref.value=''; drinkpriceref.value='';"
+           type="number" id="drinkPrice" #drinkpriceref placeholder="Enter drink price">
 
-    <button (click)="addDrink(drinknameref.value, drinkpriceref.value);drinknameref.value=''; drinkpriceref.value='';">Add New Drink</button>
+    <button (click)="addDrink(drinknameref.value, drinkpriceref.value);drinknameref.value=''; drinkpriceref.value='';">
+      Add New Drink
+    </button>
   </div>
 
   <div class="section">

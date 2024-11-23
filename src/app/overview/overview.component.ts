@@ -1,8 +1,8 @@
 import {DrinkService} from '../services/drink.service';
 import {Component} from '@angular/core';
 import {Router} from '@angular/router';
-import {firstValueFrom} from 'rxjs';
 import {Drink} from 'src/shared/drink';
+import {DataService} from "../services/data.service";
 
 @Component({
   selector: 'app-overview',
@@ -10,44 +10,42 @@ import {Drink} from 'src/shared/drink';
   styleUrls: ['./overview.component.scss']
 })
 export class OverviewComponent {
-  public drinks: Drink[] = [];
-  private fromLocalStorage: boolean = true;
-  protected checked: boolean = false;
+  public drinks!: Drink[]
+  public useAPI: boolean = false;
   apiUrl: string = '';
 
-  constructor(private ds: DrinkService, private router: Router) {
-    ds.getDrinks().subscribe((drinks) => {
-      this.drinks = drinks;
-    });
+  addDrinkNameInput: string = ''
+  addDrinkPriceInput: string = ''
+
+  constructor(private readonly drinkService: DrinkService,
+              private readonly router: Router,
+              private readonly dataService: DataService) {
+    this.dataService.drinks$.subscribe(value => {
+      this.drinks = value
+    })
   }
 
-  addDrink(drinkname: string, drinkprice: string) {
-    if (drinkname && !isNaN(Number(drinkprice))) {
-      this.ds.addDrink(drinkname, drinkprice);
-      this.updateDrinks();
+  addDrink(drinkName: string, drinkPrice: string) {
+    if (drinkName && !isNaN(Number(drinkPrice))) {
+      this.drinkService.addDrink(drinkName, Number(drinkPrice));
       this.clearInputFields();
     }
   }
 
-  deleteDrink(index: number) {
-    this.ds.deleteDrink(index);
-    this.updateDrinks();
-  }
-
-  async updateDrinks() {
-    this.drinks = await firstValueFrom(this.ds.getDrinks());
+  deleteDrink(drinkName: string) {
+    this.drinkService.deleteDrink(drinkName);
   }
 
   setToApi() {
     console.log("Setting to API");
-    this.ds.setFetchMethod(this.apiUrl)
-    this.router.navigate(['/chart']);
+    this.dataService.setFetchMethod(this.apiUrl)
+    this.router.navigate(['/chart'])
   }
 
   updateTime(syncTime: string) {
     let num = Number(syncTime)
     if (num > 0)
-      this.ds.setSyncTime(num);
+      this.drinkService.setSyncTime(num);
   }
 
   onEnter(drinkName: string, drinkPrice: string) {
