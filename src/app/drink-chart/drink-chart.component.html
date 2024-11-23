@@ -7,5 +7,7 @@
     <h3 class="pie-title">Verkaufsanteil der Getränke</h3>
     <canvas id="myPieChart"></canvas> <!-- Canvas für das Piechart -->
   </div>
+
+  <button *ngIf="DataService.DEBUG_MODE" (click)="adjustPrices()">ADJUST PRICES HERE</button>
 </div>
 

@@ -13,6 +13,7 @@ export class DataService {
   public static DRINK_KEY = 'drinkMap'
   public static SALES_COUNT_KEY = 'drinkSalesCount';
   public static CACHE_LENGTH = 5
+  public static DEBUG_MODE = true
 
   private drinks: BehaviorSubject<Drink[]>
   public readonly drinks$: Observable<Drink[]>
@@ -297,7 +298,11 @@ export class DataService {
       for (let i = 0; i < DataService.CACHE_LENGTH - 1; i++) {
         tempArray[i] = tempHistory[i + 1] - tempHistory[i]
       }
-      this.salesDifferenceMap.set(drink.name, tempArray)
+      if (DataService.DEBUG_MODE) { //debugMode to produce random numbers
+        this.salesDifferenceMap.set(drink.name, Array.from({length: 5}, () => Math.random() * 50))
+      } else {
+        this.salesDifferenceMap.set(drink.name, tempArray)
+      }
     })
   }
 }

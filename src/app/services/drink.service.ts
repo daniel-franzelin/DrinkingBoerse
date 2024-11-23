@@ -215,15 +215,19 @@ export class DrinkService {
     const minPrice = drink.purchasePrice ? drink.purchasePrice * 1.2 : 0.5 //TODO: No purchase price?
     const maxPrice = drink.purchasePrice ? drink.purchasePrice * 5 : 5 //TODO: No purchase price?
 
-    const salesAtPreviousInterval = this.dataService.getSalesCountHistoryOfDrink(drink.name)[DrinkService.ANZAHL_LABELS - 1]
-    const salesAtCurrentInterval = this.dataService.getSalesCountHistoryOfDrink(drink.name)[DrinkService.ANZAHL_LABELS]
+    let salesAtPreviousInterval = -1
+    let salesAtCurrentInterval = -1
 
-    const salesCountMap = this.salesCountMap
-    const totalSalesFromPreviousInterval: number = Array.from(salesCountMap.values())
-      .map(arr => arr[DrinkService.ANZAHL_LABELS - 1] || 0)
+    if (this.dataService.getSalesDifferenceMap().has(drink.name)) {
+      salesAtPreviousInterval = this.dataService.getSalesDifferenceMap().get(drink.name)![DrinkService.ANZAHL_LABELS - 2]
+      salesAtCurrentInterval = this.dataService.getSalesDifferenceMap().get(drink.name)![DrinkService.ANZAHL_LABELS - 1]
+    }
+
+    const totalSalesFromPreviousInterval: number = Array.from(this.dataService.getSalesDifferenceMap().values())
+      .map(arr => arr[DrinkService.ANZAHL_LABELS - 2] || 0)
       .reduce((acc, val) => acc + val, 0)
-    const totalSalesFromCurrentInterval: number = Array.from(salesCountMap.values())
-      .map(arr => arr[DrinkService.ANZAHL_LABELS] || 0)
+    const totalSalesFromCurrentInterval: number = Array.from(this.dataService.getSalesDifferenceMap().values())
+      .map(arr => arr[DrinkService.ANZAHL_LABELS - 1] || 0)
       .reduce((acc, val) => acc + val, 0)
 
     const totalSalesGrowthFactor = (totalSalesFromCurrentInterval + 1) / (totalSalesFromPreviousInterval + 1) //+1 to prevent null division
@@ -238,7 +242,7 @@ export class DrinkService {
     salesGrowthFactor /= totalSalesGrowthFactor
     console.log('normalised salesGrowthFactor of ' + drink.name + ' was ' + salesGrowthFactor)
     console.log('relative growth threshold is set at ' + DrinkService.RELATIVE_GROWTH_THRESHOLD_TO_ADJUST_PRICE)
-    const newDrinkPrice = this.mod(salesGrowthFactor) >= DrinkService.RELATIVE_GROWTH_THRESHOLD_TO_ADJUST_PRICE
+    const newDrinkPrice = this.mod(salesGrowthFactor - 1) >= DrinkService.RELATIVE_GROWTH_THRESHOLD_TO_ADJUST_PRICE //adjust price if distance to 1 is greater than threshold
       ? this.roundPriceToNearestHalf(drink.price * salesGrowthFactor)
       : this.roundPriceToNearestHalf(drink.price) //no change
 

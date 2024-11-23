@@ -32,6 +32,7 @@ export class DrinkChartComponent implements OnInit {
   private anzahlLabels: number = DataService.CACHE_LENGTH
   private chartCreated: boolean = false
   priceDropData: Drink[] = [];
+  readonly DataService = DataService;
 
   constructor(private readonly drinkService: DrinkService,
               private readonly dataService: DataService) {
@@ -201,4 +202,7 @@ export class DrinkChartComponent implements OnInit {
     return res
   }
 
+  adjustPrices() {
+    this.drinkService.adjustPrices()
+  }
 }
