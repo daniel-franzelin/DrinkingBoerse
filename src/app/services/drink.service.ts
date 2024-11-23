@@ -132,6 +132,9 @@ export class DrinkService {
     return this.syncTime;
   }
 
+  /**
+   * Returns price drop array (exists in drinkService)
+   */
   getPriceChangeArray() {
     let ret = this.priceDropArray;
     this.priceDropArray = []; //TODO: emptying here seems unsecure

@@ -26,9 +26,9 @@ export class DataService {
   public readonly drinkSalesCountMap$: Observable<Map<string, number[]>>
 
   constructor(private http: HttpClient) {
-    this.drinks = new BehaviorSubject<Drink[]>(this.getAllDrinks())
+    this.drinks = new BehaviorSubject<Drink[]>([])
     this.drinks$ = this.drinks.asObservable()
-    this.drinkSalesCountMap = new BehaviorSubject<Map<string, number[]>>(this.getAllSalesCountMap())
+    this.drinkSalesCountMap = new BehaviorSubject<Map<string, number[]>>(new Map)
     this.drinkSalesCountMap$ = this.drinkSalesCountMap.asObservable()
   }
 
