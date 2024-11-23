@@ -105,15 +105,15 @@ export class DrinkChartComponent implements OnInit {
     let pieData = [];
     let backColor = [];
     let map = this.salesCountMap
-    let drinks = this.drinks
-    for (let i = 0; i < drinks.length; i++) {
-      if (map.get(drinks[i].name)) {                                //TODO: Sort before pushing
-        console.log('Pushing to pieData: ' + map.get(drinks[i].name)![this.anzahlLabels - 1])
-        pieData.push(map.get(drinks[i].name)![this.anzahlLabels - 1]);
+    let sortedDrinks = this.sortDrinksAccordingToSales(this.drinks)
+    for (let i = 0; i < sortedDrinks.length; i++) {
+      if (map.get(sortedDrinks[i].name)) {
+        console.log('Pushing to pieData: ' + map.get(sortedDrinks[i].name)![this.anzahlLabels - 1])
+        pieData.push(map.get(sortedDrinks[i].name)![this.anzahlLabels - 1]);
       } else {
-        throw Error(drinks[i].name + ' was not found in map!')
+        throw Error(sortedDrinks[i].name + ' was not found in map!')
       }
-      backColor.push(drinks[i].color)
+      backColor.push(sortedDrinks[i].color)
     }
 
     if (!this.chartCreated) {
@@ -206,7 +206,12 @@ export class DrinkChartComponent implements OnInit {
       }
       this.salesDifferenceMap.set(drink.name, tempArray)
     })
-    console.log(this.salesDifferenceMap) //TODO: remove
+  }
+
+  sortDrinksAccordingToSales(drinks: Drink[]): Drink[] {
+    const res = [...drinks]
+    res.sort((a, b) => this.dataService.getTotalSalesCountOfDrink(a.name) - this.dataService.getTotalSalesCountOfDrink(b.name))
+    return res
   }
 
 }
