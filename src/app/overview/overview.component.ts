@@ -1,8 +1,8 @@
-import { DrinkService } from './../drink.service';
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
-import { Drink } from 'src/shared/drink';
+import {DrinkService} from '../services/drink.service';
+import {Component} from '@angular/core';
+import {Router} from '@angular/router';
+import {firstValueFrom} from 'rxjs';
+import {Drink} from 'src/shared/drink';
 
 @Component({
   selector: 'app-overview',
@@ -16,7 +16,9 @@ export class OverviewComponent {
   apiUrl: string = '';
 
   constructor(private ds: DrinkService, private router: Router) {
-    ds.getDrinks().subscribe((drinks) => { this.drinks = drinks; });
+    ds.getDrinks().subscribe((drinks) => {
+      this.drinks = drinks;
+    });
   }
 
   addDrink(drinkname: string, drinkprice: string) {
@@ -44,7 +46,7 @@ export class OverviewComponent {
 
   updateTime(syncTime: string) {
     let num = Number(syncTime)
-    if(num > 0)
+    if (num > 0)
       this.ds.setSyncTime(num);
   }
 
