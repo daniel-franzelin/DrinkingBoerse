@@ -287,14 +287,13 @@ export class DrinkService {
     const salesCountMap = this.parseObjectMapToMap(JSON.parse(localStorage.getItem(this.salesCountKey) || '{}'))
     console.log('parsed salescount to Map ' + salesCountMap)
     const totalSalesFromPreviousInterval: number = Array.from(salesCountMap.values())
-      .map(arr => arr[3] || 0)
+      .map(arr => arr[this.anzahlLabels - 1] || 0)
       .reduce((acc, val) => acc + val, 0)
     const totalSalesFromCurrentInterval: number = Array.from(salesCountMap.values())
-      .map(arr => arr[3] || 0)
+      .map(arr => arr[this.anzahlLabels] || 0)
       .reduce((acc, val) => acc + val, 0)
 
-    const totalSalesGrowthFactor = totalSalesFromCurrentInterval + 1 / totalSalesFromPreviousInterval + 1 //+1 to prevent null division
-    console.log('totalsalesgrowthfactor was ' + totalSalesGrowthFactor)
+    const totalSalesGrowthFactor = (totalSalesFromCurrentInterval + 1) / (totalSalesFromPreviousInterval + 1) //+1 to prevent null division
     let salesGrowthFactor = 1
     if (!salesFromCurrentInterval) { //if no sales, decrease price
       salesGrowthFactor = DrinkService.RELATIVE_GROWTH_THRESHOLD_TO_ADJUST_PRICE
