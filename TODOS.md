@@ -7,8 +7,10 @@
 
 - [ ] price drop animation
 
-- [ ] Save possible drinks on server -> allows saving purchase price and calculate min max 
+- [ ] Save possible drinks on server -> allows saving purchase price and calculate min max
 - [ ] Allow dynamic setting of min max price
 
 Drink Price Adjust Algorithm
-- [ ] 
+
+- [ ] local storage does not save price change
+- [ ] consider making the nearest round smaller, or at least backend smaller, and show 2 decimal
