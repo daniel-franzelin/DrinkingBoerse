@@ -1,7 +1,7 @@
-import { firstValueFrom } from 'rxjs';
-import { DrinkService } from '../drink.service';
-import { Drink } from './../../shared/drink';
-import { Component } from '@angular/core';
+import {firstValueFrom} from 'rxjs';
+import {DrinkService} from '../drink.service';
+import {Drink} from './../../shared/drink';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'app-pos',
@@ -10,7 +10,7 @@ import { Component } from '@angular/core';
 })
 export class PosComponent {
   public drinks: Drink[] = [];
-  salesCount: { [key: string] : number[] } = {}
+  salesCount: { [key: string]: number[] } = {}
   anzahlLabels: number = this.ds.getAnzahlLabels();
 
   constructor(protected ds: DrinkService) {
@@ -39,5 +39,6 @@ export class PosComponent {
     console.log(this.drinks);
     this.salesCount = await this.ds.getSalesCountMap();
   }
+
 
 }
