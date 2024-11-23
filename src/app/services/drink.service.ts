@@ -114,8 +114,8 @@ export class DrinkService {
     this.dataService.deleteDrink(drinkName)
   }
 
-  incrementSales(drinkName: string) {
-    this.dataService.incrementSales(drinkName)
+  incrementSales(drinkName: string, amount?: number) {
+    this.dataService.incrementSales(drinkName, amount)
   }
 
   /**

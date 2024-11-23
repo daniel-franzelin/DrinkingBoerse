@@ -12,6 +12,7 @@ import {DataService} from "../services/data.service";
 export class PosComponent extends ObserversModule {
   drinks!: Drink[];
   salesCountMap!: Map<string, number[]>
+  multiple: number = 1
 
 
   constructor(readonly drinkService: DrinkService,
@@ -36,15 +37,16 @@ export class PosComponent extends ObserversModule {
   }
 
   incrementSales(drinkName: string) {
-    this.drinkService.incrementSales(drinkName)
+    this.drinkService.incrementSales(drinkName, this.multiple)
+    this.resetMultiple()
   }
 
-  /*
-    async update() {
-      this.drinks = await firstValueFrom(this.drinkService.getDrinks());
-      console.log(this.drinks);
-      this.salesCount = await this.drinkService.getSalesCountMap();
+  triggerInputMultiple() {
+    this.multiple++
+  }
 
-    }
-   */
+  resetMultiple() {
+    this.multiple = 1
+  }
+
 }

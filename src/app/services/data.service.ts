@@ -193,8 +193,9 @@ export class DataService {
   /**
    * Increase last count in array of salesCount
    * @param drinkName name of drink that made a sale
+   * @param amount number of sales to increase
    */
-  incrementSales(drinkName: string) {
+  incrementSales(drinkName: string, amount?: number) {
     if (!this.drinkSalesCountMap.value.has(drinkName)) {
       throw Error(drinkName + ' was not found in local map')
     }
@@ -203,7 +204,7 @@ export class DataService {
 
     if (tempCacheHistory && tempCacheHistory.length > 0) {
       const updatedCacheHistory = [...tempCacheHistory.splice(0, tempCacheHistory.length - 1),
-        tempCacheHistory[tempCacheHistory.length - 1] + 1
+        tempCacheHistory[tempCacheHistory.length - 1] + (amount ? amount : 1)
       ]
       tempMap.set(drinkName, updatedCacheHistory)
     }

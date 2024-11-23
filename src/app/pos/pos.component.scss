@@ -47,3 +47,14 @@ p {
     max-width: 150px; /* Slightly smaller tiles for medium screens */
   }
 }
+
+.input-multiple-button-selected {
+  filter: brightness(40%);
+}
+
+.input-multiple-button {
+  background-color: #1e1e1e; /* Dark background */
+  border-radius: 8px; /* Rounded corners */
+  margin-bottom: 20px;
+  cursor: pointer; /* Pointer cursor on hover */
+}
