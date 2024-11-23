@@ -219,12 +219,10 @@ export class DataService {
   shiftSalesCacheHistory() {
     const tempMap = new Map(this.drinkSalesCountMap.value) //shallow copy
     tempMap.forEach((cacheHistory: number[], drinkName: string) => {
-      console.log('Before shift ' + tempMap.get(drinkName))
       const tempCacheHistory = [...cacheHistory]
       tempCacheHistory.shift()
       tempCacheHistory.push(tempCacheHistory[tempCacheHistory.length - 1])
       tempMap.set(drinkName, tempCacheHistory)
-      console.log('After shift ' + tempMap.get(drinkName))
     })
 
     this.updateSalesCountMap(tempMap)

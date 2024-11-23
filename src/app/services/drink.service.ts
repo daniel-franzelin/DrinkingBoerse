@@ -124,7 +124,6 @@ export class DrinkService {
   startRefreshing() {
     this.intervalId = setInterval(() => {
       this.dataService.shiftSalesCacheHistory();
-      console.log('Shifted sales count map' + this.salesCountMap)
     }, this.syncTime * 60 * 1000); // 10 minutes in milliseconds
   }
 
@@ -142,7 +141,6 @@ export class DrinkService {
   }
 
   public async adjustPrices(): Promise<void> {
-    console.log('Using algorithm: ' + DrinkService.USE_ALGORITHM_VERSION)
     switch (DrinkService.USE_ALGORITHM_VERSION) {
       case 1:
         await this.adjustPricesOfDrinksV2()

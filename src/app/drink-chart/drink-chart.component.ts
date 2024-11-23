@@ -108,7 +108,6 @@ export class DrinkChartComponent implements OnInit {
     let sortedDrinks = this.sortDrinksAccordingToSales(this.drinks)
     for (let i = 0; i < sortedDrinks.length; i++) {
       if (map.get(sortedDrinks[i].name)) {
-        console.log('Pushing to pieData: ' + map.get(sortedDrinks[i].name)![this.anzahlLabels - 1])
         pieData.push(map.get(sortedDrinks[i].name)![this.anzahlLabels - 1]);
       } else {
         throw Error(sortedDrinks[i].name + ' was not found in map!')
