@@ -13,7 +13,7 @@ import {
   PieController,
   ArcElement
 } from 'chart.js';
-import {DrinkService} from '../drink.service';
+import {DrinkService} from '../services/drink.service';
 import {Drink} from 'src/shared/drink';
 
 @Component({

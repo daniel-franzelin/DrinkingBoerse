@@ -1,20 +1,22 @@
-import {firstValueFrom} from 'rxjs';
-import {DrinkService} from '../drink.service';
+import {firstValueFrom, Subscriber, take} from 'rxjs';
+import {DrinkService} from '../services/drink.service';
 import {Drink} from './../../shared/drink';
-import {Component} from '@angular/core';
+import {Component, EventEmitter} from '@angular/core';
+import {ObserversModule} from "@angular/cdk/observers";
 
 @Component({
   selector: 'app-pos',
   templateUrl: './pos.component.html',
   styleUrls: ['./pos.component.scss']
 })
-export class PosComponent {
+export class PosComponent extends ObserversModule {
   public drinks: Drink[] = [];
   salesCount: { [key: string]: number[] } = {}
   anzahlLabels: number = this.ds.getAnzahlLabels();
 
-  constructor(protected ds: DrinkService) {
 
+  constructor(protected ds: DrinkService) {
+    super()
   }
 
   ngOnInit() {
@@ -25,8 +27,8 @@ export class PosComponent {
       }
     });*/
     //this.ds.getDrinks().forEach(ele => this.salesCount[ele.name] = 0);
-    this.update();
-
+    this.ds.getDrinks().subscribe(drinks => this.drinks = drinks)
+    this.loadDrinks()
   }
 
   incrementSales(drinkName: string) {
@@ -40,5 +42,11 @@ export class PosComponent {
     this.salesCount = await this.ds.getSalesCountMap();
   }
 
-
+  loadDrinks(): void {
+    console.log('Subscribing to drinksChange')
+    this.ds.drinksChange.subscribe(() => {
+      console.log('emission received')
+      console.log(JSON.parse(localStorage.getItem(this.ds.drinkKey) || '{}'))
+    })
+  }
 }

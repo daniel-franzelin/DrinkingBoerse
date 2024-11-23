@@ -1,20 +1,22 @@
-import {Injectable, OnInit} from '@angular/core';
+import {EventEmitter, Injectable, OnInit} from '@angular/core';
 import {Drink} from 'src/shared/drink';
 //import { Drink } from 'src/shared/Drink';
 import {HttpClient} from '@angular/common/http';
-import {map, Observable, of, firstValueFrom} from 'rxjs';  // Import 'of' for localStorage case
+import {map, Observable, of, firstValueFrom} from 'rxjs';
+import {DataService} from "./data.service";  // Import 'of' for localStorage case
 
 @Injectable({
   providedIn: 'root'
 })
 export class DrinkService {
   private drinks: Drink[] = [];
+  public drinksChange: EventEmitter<Drink[]> = new EventEmitter<Drink[]>()
   public intervalId: any;
 
   private salesCountObjectMap: { [drinkName: string]: number[] } = {};
-  private salesCountKey = 'drinkSalesCount';
+  public salesCountKey = 'drinkSalesCount';
   private priceDropArray: Drink[] = [];
-  private drinkKey = 'drinkMap'
+  public drinkKey = 'drinkMap'
   //private localKey = 'local';
   private syncTime = 1; // in min
   private fromLocalStorage: boolean = true;
@@ -23,7 +25,7 @@ export class DrinkService {
   private static RELATIVE_GROWTH_THRESHOLD_TO_ADJUST_PRICE: number = 0.5
   private static USE_ALGORITHM_VERSION: number = 2
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private dataService: DataService) {
     this.updateSalesCountMap();
     this.startRefreshing();
   }
@@ -99,7 +101,7 @@ export class DrinkService {
     );
   }
 
-  getSalesCountMap() {
+  getSalesCountMap(): { [drinkName: string]: number[] } {
     if (this.fromLocalStorage) {
       return JSON.parse(localStorage.getItem(this.salesCountKey) || '{}');
     } else
@@ -158,6 +160,9 @@ export class DrinkService {
 
   addDrink(drinkname: string, drinkprice: string) {
     this.drinks.push(new Drink(drinkname, Number(drinkprice)));
+    console.log('Emitting drinks for add')
+    this.drinksChange.emit(this.drinks)
+    console.log('Emit successful')
     this.salesCountObjectMap[drinkname] = Array(this.anzahlLabels + 1).fill(0);
     if (this.fromLocalStorage) {
       this.updateLocalStorage()
@@ -167,6 +172,9 @@ export class DrinkService {
 
   deleteDrink(index: number) {
     this.drinks.splice(index, 1)
+    console.log('Emitting drinks for delete')
+    this.drinksChange.emit(this.drinks)
+    console.log('Emit successful')
     //TODO: delete entry for drink in salescount map
     //this.salesCountMap
   }
@@ -205,7 +213,7 @@ export class DrinkService {
 
   getPriceDropArray() {
     let ret = this.priceDropArray;
-    this.priceDropArray = [];
+    this.priceDropArray = []; //TODO: emptying here seems unsecure
     return ret;
   }
 
@@ -269,6 +277,7 @@ export class DrinkService {
   public async adjustPricesOfDrinksV2(): Promise<void> {
     const drinks: Drink[] = await firstValueFrom(this.getDrinks());
     drinks.forEach((drink: Drink) => {
+      console.log('Price of ' + drink.name + ' was: ' + drink.price)
       const newDrinkPrice = this.calculateNewDrinkPrice(drink)
       if (newDrinkPrice !== drink.price) {
         this.priceDropArray.push(drink)
