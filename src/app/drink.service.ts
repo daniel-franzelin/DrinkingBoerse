@@ -270,6 +270,9 @@ export class DrinkService {
     const drinks: Drink[] = await firstValueFrom(this.getDrinks());
     drinks.forEach((drink: Drink) => {
       const newDrinkPrice = this.calculateNewDrinkPrice(drink)
+      if (newDrinkPrice !== drink.price) {
+        this.priceDropArray.push(drink)
+      }
       drink.price = newDrinkPrice
       drink.price = parseFloat(drink.price.toFixed(2))
       console.log('Price of ' + drink.name + ' updated: ' + drink.price)
