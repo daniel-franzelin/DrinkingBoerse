@@ -2,12 +2,13 @@ import { Color } from "chart.js";
 
 export class Drink {
   constructor(
-    //public id: string,
     public name: string,
-    //public category: string,
     public price: number,
-    public minPrice?: number,
-    public maxPrice?: number,
+    public uuid?: string,
+    public purchasePrice?: number,
+    public desc?: string,
+    //public minPrice?: number,
+    //public maxPrice?: number,
     public color?: Color
   ) {
     if (color == undefined) this.color = this.getRandomColor();

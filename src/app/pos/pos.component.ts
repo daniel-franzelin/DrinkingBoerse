@@ -1,3 +1,4 @@
+import { firstValueFrom } from 'rxjs';
 import { DrinkService } from '../drink.service';
 import { Drink } from './../../shared/drink';
 import { Component } from '@angular/core';
@@ -12,7 +13,7 @@ export class PosComponent {
   salesCount: { [key: string] : number[] } = {}
   anzahlLabels: number = this.ds.getAnzahlLabels();
 
-  constructor(private ds: DrinkService) {
+  constructor(protected ds: DrinkService) {
 
   }
 
@@ -33,9 +34,10 @@ export class PosComponent {
     this.update();
   }
 
-  update() {
-    this.drinks = this.ds.getDrinks();
-    this.salesCount = this.ds.getSalesCountMap();
+  async update() {
+    this.drinks = await firstValueFrom(this.ds.getDrinks());
+    console.log(this.drinks);
+    this.salesCount = await this.ds.getSalesCountMap();
   }
 
 }
